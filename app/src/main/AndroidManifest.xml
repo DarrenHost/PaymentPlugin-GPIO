@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+<!--    <uses-permission android:name="coffeeji.permission.SCANNER"/>-->
+    <uses-permission android:name="coffeeji.permission.PAYMENT_PLUGIN"/>
     <application
         android:name=".PaymentApplication"
         android:allowBackup="true"
