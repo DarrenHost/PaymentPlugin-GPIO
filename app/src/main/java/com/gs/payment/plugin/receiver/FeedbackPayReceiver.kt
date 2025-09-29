@@ -37,14 +37,14 @@ class FeedbackPayReceiver : BaseBroadReceiver() {
             Log.i(TAG, "MAKE_STATE_ACTION setGpioMode. isSetModel=${isSetModel}")
             log("MAKE_STATE_ACTION setGpioMode. isSetModel=${isSetModel}")
             if (isSetModel) {
-                val gpioState = YNHAPI.getInstance().getGpioState(YNHAPI.GPIO_1)
+                val gpioState = YNHAPI.getInstance().getGpioState(YNHAPI.GPIO_4)
                 Log.i(TAG, "MAKE_STATE_ACTION getGpioState. gpioState=${gpioState.mValue}")
                 log("MAKE_STATE_ACTION getGpioState. gpioState=${gpioState.mValue}")
                 if (gpioState.mValue != 0) {
                     return
                 }
                 val setHigh =
-                    YNHAPI.getInstance().setGpioState(YNHAPI.GPIO_1, YNHAPI.GpioState.HIGH)
+                    YNHAPI.getInstance().setGpioState(YNHAPI.GPIO_4, YNHAPI.GpioState.HIGH)
                 val timeHigh = System.currentTimeMillis()
                 Log.i(TAG, "MAKE_STATE_ACTION setGpioState to HIGH. setHigh=${setHigh}")
                 Log.i(TAG, "MAKE_STATE_ACTION setGpioState to HIGH. time=${timeHigh}")
@@ -56,7 +56,7 @@ class FeedbackPayReceiver : BaseBroadReceiver() {
                 val handler = Handler(Looper.getMainLooper())
                 handler.postDelayed({
                     val setLow =
-                        YNHAPI.getInstance().setGpioState(YNHAPI.GPIO_1, YNHAPI.GpioState.LOW)
+                        YNHAPI.getInstance().setGpioState(YNHAPI.GPIO_4, YNHAPI.GpioState.LOW)
                     val timeLow = System.currentTimeMillis()
                     Log.i(TAG, "MAKE_STATE_ACTION setGpioState to LOW. setHigh=${setLow}")
                     Log.i(TAG, "MAKE_STATE_ACTION setGpioState to LOW. time=${timeLow}")

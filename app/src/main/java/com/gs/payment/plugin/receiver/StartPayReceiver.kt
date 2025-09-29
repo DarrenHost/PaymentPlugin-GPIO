@@ -16,12 +16,56 @@ class StartPayReceiver : BaseBroadReceiver() {
         const val RESULT_ACTION = "com.coffeeji.payment.plugin.PAY_STATE_ACTION"
     }
 
+    private var orderMoney: String? = ""
     private val handler = Handler(Looper.getMainLooper())
     private val timeoutRunnable: Runnable = Runnable {
         context?.let {
             Log.i(TAG, "PAY_ACTON pay timeout.")
             log("PAY_ACTON pay timeout.")
             sendResult(it, false, "pay timeout", "")
+        }
+    }
+    private var isStart = false
+    private var startTimestamp = 0L
+    private val listener = object : YNHAPI.GpioListenerCallback {
+        override fun onChanged(index: Int, oldValue: Int, newValue: Int) {
+
+            if (oldValue == 0 && newValue == 1) {
+                Log.i(
+                    TAG,
+                    "PAY_ACTON listenGpio. The payment is successful, and the successful broadcast is sent"
+                )
+                log("PAY_ACTON listenGpio. The payment is successful, and the successful broadcast is sent")
+                sendResult(context!!, true, "The payment was successful！", orderMoney!!)
+                handler.removeCallbacks(timeoutRunnable)
+//                    // 开始
+//                    isStart = true
+//                    // 计时
+//                    startTimestamp = System.currentTimeMillis()
+//                    Log.i(
+//                        TAG,
+//                        "PAY_ACTON listenGpio. oldValue=${oldValue},newValue=${newValue},startTimestamp=${startTimestamp}"
+//                    )
+//                    log("PAY_ACTON listenGpio. oldValue=${oldValue},newValue=${newValue},startTimestamp=${startTimestamp}")
+                return
+            }
+//                if (!isStart) {
+//                    return
+//                }
+//                if (oldValue == 1 && newValue == 0) {
+//                    val currentTimestamp = System.currentTimeMillis()
+//                    Log.i(
+//                        TAG,
+//                        "PAY_ACTON listenGpio. oldValue=${oldValue},newValue=${newValue},startTimestamp=${startTimestamp},startTimestamp=${currentTimestamp}"
+//                    )
+//                    log("PAY_ACTON listenGpio. oldValue=${oldValue},newValue=${newValue},startTimestamp=${startTimestamp},startTimestamp=${currentTimestamp}")
+//                    if (currentTimestamp - startTimestamp > 800) {
+//                        Log.i(TAG, "PAY_ACTON listenGpio. The payment is successful, and the successful broadcast is sent")
+//                        log("PAY_ACTON listenGpio. The payment is successful, and the successful broadcast is sent")
+//                        sendResult(context, true, "The payment was successful！", orderMoney!!)
+//                        handler.removeCallbacks(timeoutRunnable)
+//                    }
+//                }
         }
     }
 
@@ -32,7 +76,7 @@ class StartPayReceiver : BaseBroadReceiver() {
         if (intent.action != ACTION) return
 
         val orderId = intent.getStringExtra("ORDER_ID")
-        val orderMoney = intent.getStringExtra("ORDER_MONEY")
+        orderMoney = intent.getStringExtra("ORDER_MONEY")
         val productId = intent.getStringExtra("PRODUCT_ID")
         val productName = intent.getStringExtra("PRODUCT_NAME")
         val scanCode = intent.getStringExtra("SCAN_CODE")
@@ -67,41 +111,8 @@ class StartPayReceiver : BaseBroadReceiver() {
             sendResult(context, false, "setting gpio_1 input failed！", "")
             return
         }
-        var isStart = false
-        var startTimestamp = 0L
-        YNHAPI.getInstance().listenGpio(YNHAPI.GPIO_1, object : YNHAPI.GpioListenerCallback {
-            override fun onChanged(index: Int, oldValue: Int, newValue: Int) {
-                if (oldValue == 0 && newValue == 1) {
-                    // 开始
-                    isStart = true
-                    // 计时
-                    startTimestamp = System.currentTimeMillis()
-                    Log.i(
-                        TAG,
-                        "PAY_ACTON listenGpio. oldValue=${oldValue},newValue=${newValue},startTimestamp=${startTimestamp}"
-                    )
-                    log("PAY_ACTON listenGpio. oldValue=${oldValue},newValue=${newValue},startTimestamp=${startTimestamp}")
-                    return
-                }
-                if (!isStart) {
-                    return
-                }
-                if (oldValue == 1 && newValue == 0) {
-                    val currentTimestamp = System.currentTimeMillis()
-                    Log.i(
-                        TAG,
-                        "PAY_ACTON listenGpio. oldValue=${oldValue},newValue=${newValue},startTimestamp=${startTimestamp},startTimestamp=${currentTimestamp}"
-                    )
-                    log("PAY_ACTON listenGpio. oldValue=${oldValue},newValue=${newValue},startTimestamp=${startTimestamp},startTimestamp=${currentTimestamp}")
-                    if (currentTimestamp - startTimestamp > 800) {
-                        Log.i(TAG, "PAY_ACTON listenGpio. The payment is successful, and the successful broadcast is sent")
-                        log("PAY_ACTON listenGpio. The payment is successful, and the successful broadcast is sent")
-                        sendResult(context, true, "The payment was successful！", orderMoney!!)
-                        handler.removeCallbacks(timeoutRunnable)
-                    }
-                }
-            }
-        })
+
+        YNHAPI.getInstance().listenGpio(YNHAPI.GPIO_1, listener)
 
         handler.postDelayed(timeoutRunnable, 50 * 1000)
     }
@@ -112,6 +123,7 @@ class StartPayReceiver : BaseBroadReceiver() {
         message: String,
         money: String
     ) {
+        YNHAPI.getInstance().unlistenGpio(YNHAPI.GPIO_1, listener)
         val out = Intent(RESULT_ACTION)
             .putExtra("STATE", if (success) "success" else "fail")
             .putExtra("MESSAGE", message)
