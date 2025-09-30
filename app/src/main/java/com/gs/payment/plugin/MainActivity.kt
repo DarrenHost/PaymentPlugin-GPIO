@@ -101,7 +101,7 @@ class MainActivity : ComponentActivity() {
      */
     private fun startPay() {
         val intent = Intent("com.coffeeji.payment.plugin.PAY_ACTON")
-        intent.setPackage("com.gs.payment.plugin")
+        intent.setPackage(packageName)
         intent.putExtra("ORDER_ID", "100001")
         intent.putExtra("ORDER_MONEY", "10")
         intent.putExtra("PRODUCT_ID", "1002001")
@@ -115,7 +115,7 @@ class MainActivity : ComponentActivity() {
      */
     private fun startPayScan() {
         val intent = Intent("com.coffeeji.payment.plugin.PAY_ACTON")
-        intent.setPackage("com.gs.payment.plugin")
+        intent.setPackage(packageName)
         intent.putExtra("ORDER_ID", "100001")
         intent.putExtra("ORDER_MONEY", "10")
         intent.putExtra("PRODUCT_ID", "1002001")
@@ -130,7 +130,7 @@ class MainActivity : ComponentActivity() {
      */
     private fun cancelPay() {
         val intent = Intent("com.coffeeji.payment.plugin.PAY_CANCEL_ACTON")
-        intent.setPackage("com.gs.payment.plugin")
+        intent.setPackage(packageName)
         intent.putExtra("ORDER_ID", "100001")
         intent.putExtra("ORDER_MONEY", "10")
         sendBroadcast(intent)
@@ -142,7 +142,7 @@ class MainActivity : ComponentActivity() {
      */
     private fun feedbackPay(isSuccess: Boolean) {
         val intent = Intent("com.coffeeji.payment.plugin.MAKE_STATE_ACTION")
-        intent.setPackage("com.gs.payment.plugin")
+        intent.setPackage(packageName)
         intent.putExtra("ORDER_ID", "100001")
         intent.putExtra("ORDER_MONEY", "10")
         intent.putExtra("STATE", if (isSuccess) "success" else "fail")

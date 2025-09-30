@@ -44,6 +44,25 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+    flavorDimensions "channel"
+    productFlavors {
+        plugin {
+            dimension "channel"
+            applicationId "com.gs.payment.plugin"
+            manifestPlaceholders = [
+                    appName: "PaymentPluginExample",
+                    permissionName: "coffeeji.permission.PAYMENT_PLUGIN"
+            ]
+        }
+        scanner {
+            dimension "channel"
+            applicationId "com.gs.payment.scanner"
+            manifestPlaceholders = [
+                    appName: "PaymentScannerExample",
+                    permissionName: "coffeeji.permission.SCANNER"
+            ]
+        }
+    }
 }
 
 dependencies {
